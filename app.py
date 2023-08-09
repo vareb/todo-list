@@ -11,12 +11,13 @@ class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     complete = db.Column(db.Boolean)
+    order = db.Column(db.Integer, default=0) 
     
 
 
 @app.route('/')
 def index():
-    todo_list = Todo.query.all() # returns list of all todos
+    todo_list = Todo.query.order_by(Todo.order).all() # returns list of all todos
     print(todo_list)
     return render_template('base.html', todo_list=todo_list)
 
@@ -25,7 +26,12 @@ def index():
 def add():
     # adds new todo
     title = request.form.get("title")
-    new_todo = Todo(title=title, complete=False)
+    max_order_todo = Todo.query.order_by(Todo.order.desc()).first()
+    if max_order_todo:
+        new_order = max_order_todo.order + 1
+    else:
+        new_order = 0
+    new_todo = Todo(title=title, complete=False, order=new_order)
     db.session.add(new_todo)
     db.session.commit()
     return redirect(url_for("index"))
@@ -45,6 +51,28 @@ def delete(todo_id):
     db.session.delete(todo)
     db.session.commit()
     return redirect(url_for("index"))
+
+@app.route("/moveup/<int:todo_id>")
+def moveup(todo_id):
+    todo = Todo.query.get(todo_id)
+    todoabove = Todo.query.filter(Todo.order == todo.order - 1).first()
+    if todoabove:
+        todo.order, todoabove.order = todoabove.order, todo.order
+        db.session.commit()
+    
+    return redirect(url_for("index"))
+
+
+@app.route("/movedown/<int:todo_id>")
+def movedown(todo_id):
+    todo = Todo.query.get(todo_id)
+    todobelow = Todo.query.filter(Todo.order == todo.order + 1).first()
+    if todobelow:
+        todo.order, todobelow.order = todobelow.order, todo.order
+        db.session.commit()
+    
+    return redirect(url_for("index"))
+
 
 
 
