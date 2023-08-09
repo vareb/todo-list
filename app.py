@@ -48,8 +48,16 @@ def update(todo_id):
 def delete(todo_id):
     # deletes a todo
     todo = Todo.query.filter_by(id=todo_id).first()
+    deleted_order = todo.order
     db.session.delete(todo)
     db.session.commit()
+
+    todos_to_update = Todo.query.filter(Todo.order >  deleted_order).all()
+    for todo in todos_to_update:
+        todo.order -= 1
+        db.session.commit()
+
+    
     return redirect(url_for("index"))
 
 @app.route("/moveup/<int:todo_id>")
