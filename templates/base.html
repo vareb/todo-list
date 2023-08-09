@@ -25,6 +25,16 @@
     <div class="ui segment">
         <p class="ui big header"> {{ todo.id }} | {{ todo.title }}  </p>
 
+        <div class="ui vertical buttons">
+            <button id="move-up" class="ui icon button">
+                <i class="angle up icon"></i>
+            </button>
+            <button id="move-down" class="ui icon button">
+                <i class="angle down icon"></i>
+            </button>
+        </div>
+
+
         {% if todo.complete == False %}
             <span class="ui gray label">Not Complete</span>
         {% else %}
