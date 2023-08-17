@@ -64,7 +64,7 @@ def delete(todo_id):
 def moveup(todo_id):
     todo = Todo.query.get(todo_id)
     todoabove = Todo.query.filter(Todo.order == todo.order - 1).first()
-    if todoabove:
+    if todoabove: #shouldnt change order if todo above doesnt exist
         todo.order, todoabove.order = todoabove.order, todo.order
         db.session.commit()
     
@@ -75,13 +75,11 @@ def moveup(todo_id):
 def movedown(todo_id):
     todo = Todo.query.get(todo_id)
     todobelow = Todo.query.filter(Todo.order == todo.order + 1).first()
-    if todobelow:
+    if todobelow: #shouldnt change order if below todo doesnt exist
         todo.order, todobelow.order = todobelow.order, todo.order
         db.session.commit()
     
     return redirect(url_for("index"))
-
-
 
 
 if __name__ == "__main__":
